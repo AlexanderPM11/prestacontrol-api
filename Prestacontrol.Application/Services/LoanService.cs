@@ -226,12 +226,48 @@ namespace Prestacontrol.Application.Services
 
         public async Task<bool> DeleteLoanAsync(int loanId)
         {
-            var loan = await _unitOfWork.Loans.GetByIdAsync(loanId);
-            if (loan == null) return false;
+            try
+            {
+                var loan = await _unitOfWork.Loans.GetByIdAsync(loanId);
+                if (loan == null) return false;
 
-            _unitOfWork.Loans.Delete(loan);
-            await _unitOfWork.CompleteAsync();
-            return true;
+                // 1. Delete Financial Transactions related to this loan
+                var transactions = await _unitOfWork.FinancialTransactions.FindAsync(t => t.LoanId == loanId);
+                foreach (var tx in transactions) _unitOfWork.FinancialTransactions.Delete(tx);
+
+                // 2. Delete Payments (and ensure their transactions are nullified or deleted)
+                var payments = await _unitOfWork.Payments.FindAsync(p => p.LoanId == loanId);
+                foreach (var p in payments)
+                {
+                    // Find transactions linked to this specific payment that might not have LoanId
+                    var paymentTxs = await _unitOfWork.FinancialTransactions.FindAsync(t => t.PaymentId == p.Id);
+                    foreach (var ptx in paymentTxs) _unitOfWork.FinancialTransactions.Delete(ptx);
+                    
+                    _unitOfWork.Payments.Delete(p);
+                }
+
+                // 3. Delete Installments
+                var installments = await _unitOfWork.Installments.FindAsync(i => i.LoanId == loanId);
+                foreach (var i in installments) _unitOfWork.Installments.Delete(i);
+
+                // 4. Delete Audit Logs
+                var audits = await _unitOfWork.LoanAuditLogs.FindAsync(a => a.LoanId == loanId);
+                foreach (var a in audits) _unitOfWork.LoanAuditLogs.Delete(a);
+
+                // 5. Finally delete the Loan
+                _unitOfWork.Loans.Delete(loan);
+
+                await _unitOfWork.CompleteAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting loan {loanId}: {ex.Message}");
+                if (ex.InnerException != null)
+                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                
+                throw new Exception($"Error de base de datos al eliminar: {ex.InnerException?.Message ?? ex.Message}");
+            }
         }
 
         private DateTime CalculateDueDate(DateTime start, LoanFrequency freq, int installmentNumber)
