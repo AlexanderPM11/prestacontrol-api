@@ -95,6 +95,15 @@ namespace Prestacontrol.Application.Services
 
             loan.Status = LoanStatus.Cancelled;
             _unitOfWork.Loans.Update(loan);
+
+            await _unitOfWork.LoanAuditLogs.AddAsync(new LoanAuditLog
+            {
+                LoanId = loanId,
+                Action = "Anulación",
+                ChangesDescription = "El préstamo fue anulado manualmente por el administrador.",
+                Date = DateTime.Now
+            });
+
             await _unitOfWork.CompleteAsync();
             return true;
         }
@@ -108,6 +117,15 @@ namespace Prestacontrol.Application.Services
 
             loan.Status = LoanStatus.Active; // Simplest assumption; could also check if it should be Overdue
             _unitOfWork.Loans.Update(loan);
+
+            await _unitOfWork.LoanAuditLogs.AddAsync(new LoanAuditLog
+            {
+                LoanId = loanId,
+                Action = "Reactivación",
+                ChangesDescription = "El préstamo fue reactivado tras haber sido anulado.",
+                Date = DateTime.Now
+            });
+
             await _unitOfWork.CompleteAsync();
             return true;
         }
@@ -118,10 +136,18 @@ namespace Prestacontrol.Application.Services
             return _mapper.Map<IEnumerable<PaymentDto>>(payments.OrderByDescending(p => p.PaymentDate));
         }
 
+        public async Task<IEnumerable<LoanAuditLogDto>> GetLoanAuditsAsync(int loanId)
+        {
+            var audits = await _unitOfWork.LoanAuditLogs.FindAsync(a => a.LoanId == loanId);
+            return _mapper.Map<IEnumerable<LoanAuditLogDto>>(audits.OrderByDescending(a => a.Date));
+        }
+
         public async Task<bool> UpdateLoanAsync(int loanId, UpdateLoanRequest request)
         {
             var loan = await _unitOfWork.Loans.GetByIdAsync(loanId);
             if (loan == null) return false;
+
+            var oldValues = $"Cliente: {loan.ClientName}, Monto: {loan.Amount}, Tasa: {loan.InterestRate}%, Cuotas: {loan.InstallmentsCount}, Frecuencia: {loan.Frequency}, Inicio: {loan.StartDate.ToShortDateString()}";
 
             var payments = await _unitOfWork.Payments.FindAsync(p => p.LoanId == loanId);
             if (payments.Any())
@@ -129,6 +155,15 @@ namespace Prestacontrol.Application.Services
                 // Can only update ClientName if payments exist
                 loan.ClientName = request.ClientName;
                 _unitOfWork.Loans.Update(loan);
+                
+                await _unitOfWork.LoanAuditLogs.AddAsync(new LoanAuditLog
+                {
+                    LoanId = loanId,
+                    Action = "Edición General",
+                    ChangesDescription = $"Se actualizó el nombre del cliente a: {request.ClientName}. Los campos financieros no fueron modificados porque el préstamo tiene cobros.",
+                    Date = DateTime.Now
+                });
+
                 await _unitOfWork.CompleteAsync();
                 return true;
             }
@@ -173,6 +208,17 @@ namespace Prestacontrol.Application.Services
             loan.Installments = newInstallments;
             
             _unitOfWork.Loans.Update(loan);
+
+            var newValues = $"Cliente: {loan.ClientName}, Monto: {loan.Amount}, Tasa: {loan.InterestRate}%, Cuotas: {loan.InstallmentsCount}, Frecuencia: {loan.Frequency}, Inicio: {loan.StartDate.ToShortDateString()}";
+
+            await _unitOfWork.LoanAuditLogs.AddAsync(new LoanAuditLog
+            {
+                LoanId = loanId,
+                Action = "Reestructuración",
+                ChangesDescription = $"Cambio completo de condiciones. ANTES: [{oldValues}] | AHORA: [{newValues}]",
+                Date = DateTime.Now
+            });
+
             await _unitOfWork.CompleteAsync();
 
             return true;

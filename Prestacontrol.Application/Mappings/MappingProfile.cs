@@ -15,6 +15,7 @@ namespace Prestacontrol.Application.Mappings
             
             CreateMap<CreateLoanRequest, Loan>();
             CreateMap<FinancialTransaction, TransactionDto>();
+            CreateMap<LoanAuditLog, LoanAuditLogDto>();
         }
     }
 }

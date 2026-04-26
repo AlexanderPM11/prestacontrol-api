@@ -110,4 +110,13 @@ namespace Prestacontrol.Domain.Entities
         public string Value { get; set; } = string.Empty;
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }
+
+    public class LoanAuditLog : BaseEntity
+    {
+        public int LoanId { get; set; }
+        public Loan Loan { get; set; } = null!;
+        public string Action { get; set; } = string.Empty; // e.g., "Edited", "Cancelled", "Reactivated"
+        public string ChangesDescription { get; set; } = string.Empty;
+        public DateTime Date { get; set; } = DateTime.Now;
+    }
 }

@@ -10,12 +10,12 @@ namespace Prestacontrol.Infrastructure.Persistence
         public DbSet<User> Users { get; set; }
 
         public DbSet<Loan> Loans { get; set; }
-        public DbSet<Installment> Installments { get; set; }
-        public DbSet<Payment> Payments { get; set; }
-        public DbSet<CashFlow> CashFlows { get; set; }
-        public DbSet<FinancialTransaction> FinancialTransactions { get; set; }
-        public DbSet<SystemConfig> SystemConfigs { get; set; }
-
+        public DbSet<Installment> Installments { get; set; } = null!;
+        public DbSet<Payment> Payments { get; set; } = null!;
+        public DbSet<CashFlow> CashFlows { get; set; } = null!;
+        public DbSet<FinancialTransaction> FinancialTransactions { get; set; } = null!;
+        public DbSet<SystemConfig> SystemConfigs { get; set; } = null!;
+        public DbSet<LoanAuditLog> LoanAuditLogs { get; set; } = null!;
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

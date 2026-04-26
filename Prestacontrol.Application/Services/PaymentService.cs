@@ -23,6 +23,9 @@ namespace Prestacontrol.Application.Services
             var loan = await _unitOfWork.Loans.GetByIdAsync(request.LoanId);
             if (loan == null) throw new Exception("Préstamo no encontrado");
 
+            if (request.Amount > loan.BalanceDue + 0.01m) // Adding tiny buffer for rounding
+                throw new Exception($"El monto a pagar (${request.Amount}) supera el saldo pendiente (${loan.BalanceDue})");
+
             var remainingAmount = request.Amount;
             var transactions = new List<FinancialTransaction>();
 
@@ -48,8 +51,10 @@ namespace Prestacontrol.Application.Services
 
                 if (remainingAmount <= 0) break;
 
-                // B. Pay Interest
-                var unpaidInterest = inst.InterestAmount - (inst.PaidAmount > inst.PrincipalAmount ? inst.PaidAmount - inst.PrincipalAmount : 0);
+                // B. Pay Interest (Interest is paid before Principal)
+                var interestPaid = Math.Min(inst.PaidAmount, inst.InterestAmount);
+                var unpaidInterest = inst.InterestAmount - interestPaid;
+                
                 if (unpaidInterest > 0)
                 {
                     var interestToPay = Math.Min(remainingAmount, unpaidInterest);
@@ -62,7 +67,9 @@ namespace Prestacontrol.Application.Services
                 if (remainingAmount <= 0) break;
 
                 // C. Pay Principal
-                var unpaidPrincipal = inst.PrincipalAmount - (inst.PaidAmount < inst.PrincipalAmount ? inst.PaidAmount : inst.PrincipalAmount);
+                var principalPaid = Math.Max(0, inst.PaidAmount - inst.InterestAmount);
+                var unpaidPrincipal = inst.PrincipalAmount - principalPaid;
+                
                 if (unpaidPrincipal > 0)
                 {
                     var principalToPay = Math.Min(remainingAmount, unpaidPrincipal);

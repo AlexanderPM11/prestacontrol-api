@@ -67,6 +67,13 @@ namespace Prestacontrol.API.Controllers
             return Ok(payments);
         }
 
+        [HttpGet("{id}/audits")]
+        public async Task<ActionResult<IEnumerable<LoanAuditLogDto>>> GetAudits(int id)
+        {
+            var audits = await _loanService.GetLoanAuditsAsync(id);
+            return Ok(audits);
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateLoan(int id, [FromBody] UpdateLoanRequest request)
         {

@@ -95,4 +95,12 @@ namespace Prestacontrol.Application.DTOs
         public string Description { get; set; } = string.Empty;
         public DateTime Date { get; set; }
     }
+
+    public class LoanAuditLogDto
+    {
+        public int Id { get; set; }
+        public string Action { get; set; } = string.Empty;
+        public string ChangesDescription { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+    }
 }
