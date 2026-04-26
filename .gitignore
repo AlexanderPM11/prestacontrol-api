@@ -1,0 +1,34 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.cache
+*.pdb
+*.dbmdl
+
+# Build Results
+bin/
+obj/
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Node Modules
+node_modules/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+
+# React Build
+dist/
+
+# OS Files
+.DS_Store
+Thumbs.db

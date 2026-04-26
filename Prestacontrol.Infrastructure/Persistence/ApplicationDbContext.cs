@@ -1,0 +1,95 @@
+using Microsoft.EntityFrameworkCore;
+using Prestacontrol.Domain.Entities;
+
+namespace Prestacontrol.Infrastructure.Persistence
+{
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<Loan> Loans { get; set; }
+        public DbSet<Installment> Installments { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<CashFlow> CashFlows { get; set; }
+        public DbSet<SystemConfig> SystemConfigs { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // User configuration
+            modelBuilder.Entity<User>(entity => {
+                entity.HasIndex(e => e.Username).IsUnique();
+            });
+
+            // Client configuration
+            modelBuilder.Entity<Client>(entity => {
+                entity.HasIndex(e => e.DocumentId).IsUnique();
+            });
+
+            // Loan configuration
+            modelBuilder.Entity<Loan>(entity => {
+                entity.Property(e => e.Amount).HasPrecision(15, 2);
+                entity.Property(e => e.InterestRate).HasPrecision(5, 2);
+                entity.Property(e => e.TotalToPay).HasPrecision(15, 2);
+                entity.Property(e => e.BalanceDue).HasPrecision(15, 2);
+
+                entity.HasOne(e => e.Client)
+                    .WithMany(c => c.Loans)
+                    .HasForeignKey(e => e.ClientId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.CreatedLoans)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Installment configuration
+            modelBuilder.Entity<Installment>(entity => {
+                entity.Property(e => e.Amount).HasPrecision(15, 2);
+                entity.Property(e => e.PrincipalAmount).HasPrecision(15, 2);
+                entity.Property(e => e.InterestAmount).HasPrecision(15, 2);
+                entity.Property(e => e.PaidAmount).HasPrecision(15, 2);
+                entity.Property(e => e.ArrearsAmount).HasPrecision(15, 2);
+
+                entity.HasOne(e => e.Loan)
+                    .WithMany(l => l.Installments)
+                    .HasForeignKey(e => e.LoanId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            // Payment configuration
+            modelBuilder.Entity<Payment>(entity => {
+                entity.Property(e => e.Amount).HasPrecision(15, 2);
+
+                entity.HasOne(e => e.Loan)
+                    .WithMany(l => l.Payments)
+                    .HasForeignKey(e => e.LoanId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.CollectedPayments)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // CashFlow configuration
+            modelBuilder.Entity<CashFlow>(entity => {
+                entity.Property(e => e.Amount).HasPrecision(15, 2);
+
+                entity.HasOne(e => e.User)
+                    .WithMany(u => u.RegisteredCashFlows)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // SystemConfig configuration
+            modelBuilder.Entity<SystemConfig>(entity => {
+                entity.HasKey(e => e.Key);
+            });
+        }
+    }
+}
