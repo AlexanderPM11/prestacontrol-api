@@ -1,34 +1,42 @@
-# Visual Studio
-.vs/
+# .NET Core
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
 *.user
 *.suo
 *.cache
 *.pdb
 *.dbmdl
-
-# Build Results
-bin/
-obj/
-
-# Rider
-.idea/
-
-# VS Code
+.vs/
 .vscode/
+.idea/
+*.sln.ids
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 
-# Node Modules
+# Node / React
 node_modules/
-
-# Logs
-*.log
-
-# Environment
+dist/
+dist-ssr/
+*.local
 .env
 .env.*
+.eslintcache
 
-# React Build
-dist/
+# PWA
+dev-dist/
 
 # OS Files
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Testing
+TestResults/
