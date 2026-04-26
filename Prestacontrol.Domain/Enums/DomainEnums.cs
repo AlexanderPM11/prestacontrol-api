@@ -27,7 +27,8 @@ namespace Prestacontrol.Domain.Enums
         Active,
         Paid,
         Overdue,
-        Defaulted
+        Defaulted,
+        Cancelled
     }
 
     public enum InstallmentStatus
