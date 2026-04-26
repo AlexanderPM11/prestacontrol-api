@@ -22,6 +22,7 @@ namespace Prestacontrol.Domain.Interfaces
     public interface IInstallmentRepository : IGenericRepository<Entities.Installment> { }
     public interface IPaymentRepository : IGenericRepository<Entities.Payment> { }
     public interface ICashFlowRepository : IGenericRepository<Entities.CashFlow> { }
+    public interface IFinancialTransactionRepository : IGenericRepository<Entities.FinancialTransaction> { }
 
     public interface IUnitOfWork : IDisposable
     {
@@ -31,6 +32,7 @@ namespace Prestacontrol.Domain.Interfaces
         IInstallmentRepository Installments { get; }
         IPaymentRepository Payments { get; }
         ICashFlowRepository CashFlows { get; }
+        IFinancialTransactionRepository FinancialTransactions { get; }
         Task<int> CompleteAsync();
     }
 }

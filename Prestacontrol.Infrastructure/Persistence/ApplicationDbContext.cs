@@ -13,6 +13,7 @@ namespace Prestacontrol.Infrastructure.Persistence
         public DbSet<Installment> Installments { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<CashFlow> CashFlows { get; set; }
+        public DbSet<FinancialTransaction> FinancialTransactions { get; set; }
         public DbSet<SystemConfig> SystemConfigs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -33,6 +34,7 @@ namespace Prestacontrol.Infrastructure.Persistence
             modelBuilder.Entity<Loan>(entity => {
                 entity.Property(e => e.Amount).HasPrecision(15, 2);
                 entity.Property(e => e.InterestRate).HasPrecision(5, 2);
+                entity.Property(e => e.LateFeeRate).HasPrecision(5, 2);
                 entity.Property(e => e.TotalToPay).HasPrecision(15, 2);
                 entity.Property(e => e.BalanceDue).HasPrecision(15, 2);
 
@@ -52,6 +54,7 @@ namespace Prestacontrol.Infrastructure.Persistence
                 entity.Property(e => e.Amount).HasPrecision(15, 2);
                 entity.Property(e => e.PrincipalAmount).HasPrecision(15, 2);
                 entity.Property(e => e.InterestAmount).HasPrecision(15, 2);
+                entity.Property(e => e.LateFeeAmount).HasPrecision(15, 2);
                 entity.Property(e => e.PaidAmount).HasPrecision(15, 2);
                 entity.Property(e => e.ArrearsAmount).HasPrecision(15, 2);
 
@@ -82,6 +85,26 @@ namespace Prestacontrol.Infrastructure.Persistence
 
                 entity.HasOne(e => e.User)
                     .WithMany(u => u.RegisteredCashFlows)
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // FinancialTransaction configuration
+            modelBuilder.Entity<FinancialTransaction>(entity => {
+                entity.Property(e => e.Amount).HasPrecision(15, 2);
+
+                entity.HasOne(e => e.Loan)
+                    .WithMany()
+                    .HasForeignKey(e => e.LoanId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.Payment)
+                    .WithMany()
+                    .HasForeignKey(e => e.PaymentId)
+                    .OnDelete(DeleteBehavior.SetNull);
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
                     .HasForeignKey(e => e.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
             });

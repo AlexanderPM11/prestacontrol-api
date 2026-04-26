@@ -25,5 +25,18 @@ namespace Prestacontrol.API.Controllers
             var result = await _authService.RegisterAsync(userDto, password);
             return Ok(result);
         }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+        {
+            var result = await _authService.ForgotPasswordAsync(request.Username);
+            if (!result) return NotFound(new { message = "Usuario no encontrado" });
+            return Ok(new { message = "Enlace de recuperación enviado a Telegram" });
+        }
+    }
+
+    public class ForgotPasswordRequest
+    {
+        public string Username { get; set; } = string.Empty;
     }
 }

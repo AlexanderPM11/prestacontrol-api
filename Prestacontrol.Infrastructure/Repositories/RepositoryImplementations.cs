@@ -30,6 +30,7 @@ namespace Prestacontrol.Infrastructure.Repositories
     public class InstallmentRepository : GenericRepository<Installment>, IInstallmentRepository { public InstallmentRepository(Persistence.ApplicationDbContext context) : base(context) { } }
     public class PaymentRepository : GenericRepository<Payment>, IPaymentRepository { public PaymentRepository(Persistence.ApplicationDbContext context) : base(context) { } }
     public class CashFlowRepository : GenericRepository<CashFlow>, ICashFlowRepository { public CashFlowRepository(Persistence.ApplicationDbContext context) : base(context) { } }
+    public class FinancialTransactionRepository : GenericRepository<FinancialTransaction>, IFinancialTransactionRepository { public FinancialTransactionRepository(Persistence.ApplicationDbContext context) : base(context) { } }
 
     public class UnitOfWork : IUnitOfWork
     {
@@ -43,6 +44,7 @@ namespace Prestacontrol.Infrastructure.Repositories
             Installments = new InstallmentRepository(_context);
             Payments = new PaymentRepository(_context);
             CashFlows = new CashFlowRepository(_context);
+            FinancialTransactions = new FinancialTransactionRepository(_context);
         }
 
         public IUserRepository Users { get; private set; }
@@ -51,6 +53,7 @@ namespace Prestacontrol.Infrastructure.Repositories
         public IInstallmentRepository Installments { get; private set; }
         public IPaymentRepository Payments { get; private set; }
         public ICashFlowRepository CashFlows { get; private set; }
+        public IFinancialTransactionRepository FinancialTransactions { get; private set; }
 
         public async Task<int> CompleteAsync() => await _context.SaveChangesAsync();
         public void Dispose() => _context.Dispose();

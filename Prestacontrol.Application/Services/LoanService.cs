@@ -32,6 +32,7 @@ namespace Prestacontrol.Application.Services
                 UserId = userId,
                 Amount = request.Amount,
                 InterestRate = request.InterestRate,
+                LateFeeRate = request.LateFeeRate,
                 Frequency = request.Frequency,
                 InstallmentsCount = request.InstallmentsCount,
                 StartDate = request.StartDate,

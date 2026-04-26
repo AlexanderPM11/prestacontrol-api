@@ -28,6 +28,10 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ILoanService, LoanService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<ITelegramService, TelegramService>();
+builder.Services.AddHttpClient<ITelegramService, TelegramService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IDelinquencyService, DelinquencyService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));

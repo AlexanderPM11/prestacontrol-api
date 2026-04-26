@@ -33,11 +33,14 @@ namespace Prestacontrol.Application.DTOs
         public string ClientName { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public decimal InterestRate { get; set; }
+        public decimal LateFeeRate { get; set; }
         public LoanFrequency Frequency { get; set; }
         public int InstallmentsCount { get; set; }
         public decimal TotalToPay { get; set; }
         public decimal BalanceDue { get; set; }
         public LoanStatus Status { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public List<InstallmentDto> Installments { get; set; } = new();
     }
 
@@ -57,8 +60,27 @@ namespace Prestacontrol.Application.DTOs
         public int ClientId { get; set; }
         public decimal Amount { get; set; }
         public decimal InterestRate { get; set; }
+        public decimal LateFeeRate { get; set; }
         public LoanFrequency Frequency { get; set; }
         public int InstallmentsCount { get; set; }
         public DateTime StartDate { get; set; }
+    }
+
+    public class PaymentRequest
+    {
+        public int LoanId { get; set; }
+        public decimal Amount { get; set; }
+        public string PaymentMethod { get; set; } = "Efectivo";
+        public string? Notes { get; set; }
+        public DateTime PaymentDate { get; set; } = DateTime.Now;
+    }
+
+    public class TransactionDto
+    {
+        public int Id { get; set; }
+        public decimal Amount { get; set; }
+        public string Type { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
     }
 }

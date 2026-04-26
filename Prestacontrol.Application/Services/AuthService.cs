@@ -44,12 +44,14 @@ namespace Prestacontrol.Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
+        private readonly ITelegramService _telegramService;
 
-        public AuthService(IUnitOfWork unitOfWork, IJwtService jwtService, IMapper mapper)
+        public AuthService(IUnitOfWork unitOfWork, IJwtService jwtService, IMapper mapper, ITelegramService telegramService)
         {
             _unitOfWork = unitOfWork;
             _jwtService = jwtService;
             _mapper = mapper;
+            _telegramService = telegramService;
         }
 
         public async Task<LoginResponse?> LoginAsync(LoginRequest request)
@@ -80,6 +82,21 @@ namespace Prestacontrol.Application.Services
             await _unitOfWork.CompleteAsync();
 
             return _mapper.Map<UserDto>(user);
+        }
+
+        public async Task<bool> ForgotPasswordAsync(string username)
+        {
+            var user = await _unitOfWork.Users.GetByUsernameAsync(username);
+            if (user == null) return false;
+
+            var message = $"<b>🔑 Recuperación de Contraseña</b>\n\n" +
+                          $"Hola <b>{user.FullName}</b>,\n" +
+                          $"Has solicitado recuperar tu contraseña en <b>Prestacontrol</b>.\n\n" +
+                          $"Tu contraseña es: <code>{user.PasswordHash}</code>\n\n" +
+                          $"<i>Por seguridad, te recomendamos cambiarla desde el panel de configuración.</i>";
+
+            await _telegramService.SendMessageAsync(message);
+            return true;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Prestacontrol.Domain.Enums
         Pending,
         Active,
         Paid,
-        Late,
+        Overdue,
         Defaulted
     }
 
@@ -35,7 +35,7 @@ namespace Prestacontrol.Domain.Enums
         Pending,
         Partial,
         Paid,
-        Late
+        Overdue
     }
 
     public enum CashFlowType

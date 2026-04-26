@@ -45,6 +45,7 @@ namespace Prestacontrol.Domain.Entities
 
         public decimal Amount { get; set; }
         public decimal InterestRate { get; set; }
+        public decimal LateFeeRate { get; set; } // Daily or percentage
         public LoanFrequency Frequency { get; set; }
         public int InstallmentsCount { get; set; }
         public DateTime StartDate { get; set; }
@@ -66,6 +67,7 @@ namespace Prestacontrol.Domain.Entities
         public decimal Amount { get; set; }
         public decimal PrincipalAmount { get; set; }
         public decimal InterestAmount { get; set; }
+        public decimal LateFeeAmount { get; set; } = 0;
         public decimal PaidAmount { get; set; } = 0;
         public decimal ArrearsAmount { get; set; } = 0;
         public InstallmentStatus Status { get; set; } = InstallmentStatus.Pending;
@@ -97,6 +99,21 @@ namespace Prestacontrol.Domain.Entities
         public string? Description { get; set; }
         public int UserId { get; set; }
         public User User { get; set; } = null!;
+        public DateTime Date { get; set; } = DateTime.Now;
+    }
+
+    public class FinancialTransaction : BaseEntity
+    {
+        public int? LoanId { get; set; }
+        public Loan? Loan { get; set; }
+        public int? PaymentId { get; set; }
+        public Payment? Payment { get; set; }
+        public int UserId { get; set; }
+        public User User { get; set; } = null!;
+
+        public decimal Amount { get; set; }
+        public string Type { get; set; } = string.Empty; // Capital, Interest, LateFee
+        public string Description { get; set; } = string.Empty;
         public DateTime Date { get; set; } = DateTime.Now;
     }
 
