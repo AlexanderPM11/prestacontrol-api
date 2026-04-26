@@ -14,6 +14,11 @@ namespace Prestacontrol.Application.Interfaces
         Task<LoanDto> CreateLoanAsync(CreateLoanRequest request, int userId);
         Task<IEnumerable<LoanDto>> GetClientLoansAsync(string clientName);
         Task<LoanDto?> GetLoanDetailsAsync(int loanId);
+        Task<IEnumerable<PaymentDto>> GetLoanPaymentsAsync(int loanId);
+        Task<bool> CancelLoanAsync(int loanId);
+        Task<bool> ReactivateLoanAsync(int loanId);
+        Task<bool> UpdateLoanAsync(int loanId, UpdateLoanRequest request);
+        Task<bool> DeleteLoanAsync(int loanId);
     }
 
     public interface IJwtService

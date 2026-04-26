@@ -64,6 +64,29 @@ namespace Prestacontrol.Application.DTOs
         public DateTime PaymentDate { get; set; } = DateTime.Now;
     }
 
+    public class PaymentDto
+    {
+        public int Id { get; set; }
+        public int LoanId { get; set; }
+        public decimal Amount { get; set; }
+        public DateTime PaymentDate { get; set; }
+        public string PaymentMethod { get; set; } = string.Empty;
+        public string? Notes { get; set; }
+        public int? InstallmentId { get; set; }
+    }
+
+    public class UpdateLoanRequest
+    {
+        public string ClientName { get; set; } = string.Empty;
+        // Only applied if no payments have been made
+        public decimal Amount { get; set; }
+        public decimal InterestRate { get; set; }
+        public decimal LateFeeRate { get; set; }
+        public LoanFrequency Frequency { get; set; }
+        public int InstallmentsCount { get; set; }
+        public DateTime StartDate { get; set; }
+    }
+
     public class TransactionDto
     {
         public int Id { get; set; }

@@ -86,6 +86,108 @@ namespace Prestacontrol.Application.Services
             return _mapper.Map<LoanDto>(loan);
         }
 
+        public async Task<bool> CancelLoanAsync(int loanId)
+        {
+            var loan = await _unitOfWork.Loans.GetByIdAsync(loanId);
+            if (loan == null) return false;
+
+            if (loan.Status == LoanStatus.Paid) return false;
+
+            loan.Status = LoanStatus.Cancelled;
+            _unitOfWork.Loans.Update(loan);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        public async Task<bool> ReactivateLoanAsync(int loanId)
+        {
+            var loan = await _unitOfWork.Loans.GetByIdAsync(loanId);
+            if (loan == null) return false;
+
+            if (loan.Status != LoanStatus.Cancelled) return false; // Only cancelled loans can be reactivated
+
+            loan.Status = LoanStatus.Active; // Simplest assumption; could also check if it should be Overdue
+            _unitOfWork.Loans.Update(loan);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
+        public async Task<IEnumerable<PaymentDto>> GetLoanPaymentsAsync(int loanId)
+        {
+            var payments = await _unitOfWork.Payments.FindAsync(p => p.LoanId == loanId);
+            return _mapper.Map<IEnumerable<PaymentDto>>(payments.OrderByDescending(p => p.PaymentDate));
+        }
+
+        public async Task<bool> UpdateLoanAsync(int loanId, UpdateLoanRequest request)
+        {
+            var loan = await _unitOfWork.Loans.GetByIdAsync(loanId);
+            if (loan == null) return false;
+
+            var payments = await _unitOfWork.Payments.FindAsync(p => p.LoanId == loanId);
+            if (payments.Any())
+            {
+                // Can only update ClientName if payments exist
+                loan.ClientName = request.ClientName;
+                _unitOfWork.Loans.Update(loan);
+                await _unitOfWork.CompleteAsync();
+                return true;
+            }
+
+            // If no payments, we can update everything and regenerate installments
+            loan.ClientName = request.ClientName;
+            loan.Amount = request.Amount;
+            loan.InterestRate = request.InterestRate;
+            loan.LateFeeRate = request.LateFeeRate;
+            loan.Frequency = request.Frequency;
+            loan.InstallmentsCount = request.InstallmentsCount;
+            loan.StartDate = request.StartDate;
+
+            // Recalculate totals
+            var totalInterest = loan.Amount * (loan.InterestRate / 100);
+            loan.TotalToPay = loan.Amount + totalInterest;
+            loan.BalanceDue = loan.TotalToPay;
+
+            var existingInstallments = await _unitOfWork.Installments.FindAsync(i => i.LoanId == loanId);
+            foreach (var inst in existingInstallments)
+            {
+                _unitOfWork.Installments.Delete(inst);
+            }
+
+            var baseInstallmentAmount = loan.TotalToPay / loan.InstallmentsCount;
+            var newInstallments = new List<Installment>();
+            for (int i = 1; i <= loan.InstallmentsCount; i++)
+            {
+                var dueDate = CalculateDueDate(loan.StartDate, loan.Frequency, i);
+                newInstallments.Add(new Installment
+                {
+                    InstallmentNumber = i,
+                    DueDate = dueDate,
+                    Amount = baseInstallmentAmount,
+                    PrincipalAmount = loan.Amount / loan.InstallmentsCount,
+                    InterestAmount = totalInterest / loan.InstallmentsCount,
+                    Status = InstallmentStatus.Pending
+                });
+                loan.EndDate = dueDate;
+            }
+
+            loan.Installments = newInstallments;
+            
+            _unitOfWork.Loans.Update(loan);
+            await _unitOfWork.CompleteAsync();
+
+            return true;
+        }
+
+        public async Task<bool> DeleteLoanAsync(int loanId)
+        {
+            var loan = await _unitOfWork.Loans.GetByIdAsync(loanId);
+            if (loan == null) return false;
+
+            _unitOfWork.Loans.Delete(loan);
+            await _unitOfWork.CompleteAsync();
+            return true;
+        }
+
         private DateTime CalculateDueDate(DateTime start, LoanFrequency freq, int installmentNumber)
         {
             return freq switch
