@@ -17,7 +17,7 @@ namespace Prestacontrol.Domain.Interfaces
         Task<Entities.User?> GetByUsernameAsync(string username);
     }
 
-    public interface IClientRepository : IGenericRepository<Entities.Client> { }
+
     public interface ILoanRepository : IGenericRepository<Entities.Loan> { }
     public interface IInstallmentRepository : IGenericRepository<Entities.Installment> { }
     public interface IPaymentRepository : IGenericRepository<Entities.Payment> { }
@@ -27,7 +27,7 @@ namespace Prestacontrol.Domain.Interfaces
     public interface IUnitOfWork : IDisposable
     {
         IUserRepository Users { get; }
-        IClientRepository Clients { get; }
+
         ILoanRepository Loans { get; }
         IInstallmentRepository Installments { get; }
         IPaymentRepository Payments { get; }

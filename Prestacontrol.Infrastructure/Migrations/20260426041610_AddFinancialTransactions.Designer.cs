@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Prestacontrol.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Prestacontrol.Infrastructure.Persistence;
 namespace Prestacontrol.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260426041610_AddFinancialTransactions")]
+    partial class AddFinancialTransactions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,6 +64,55 @@ namespace Prestacontrol.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("CashFlows");
+                });
+
+            modelBuilder.Entity("Prestacontrol.Domain.Entities.Client", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DocumentId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhotoUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ReferenceName")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ReferencePhone")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId")
+                        .IsUnique();
+
+                    b.ToTable("Clients");
                 });
 
             modelBuilder.Entity("Prestacontrol.Domain.Entities.FinancialTransaction", b =>
@@ -188,9 +240,8 @@ namespace Prestacontrol.Infrastructure.Migrations
                         .HasPrecision(15, 2)
                         .HasColumnType("decimal(15,2)");
 
-                    b.Property<string>("ClientName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("ClientId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -229,6 +280,8 @@ namespace Prestacontrol.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
 
                     b.HasIndex("UserId");
 
@@ -389,11 +442,19 @@ namespace Prestacontrol.Infrastructure.Migrations
 
             modelBuilder.Entity("Prestacontrol.Domain.Entities.Loan", b =>
                 {
+                    b.HasOne("Prestacontrol.Domain.Entities.Client", "Client")
+                        .WithMany("Loans")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Prestacontrol.Domain.Entities.User", "User")
                         .WithMany("CreatedLoans")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Client");
 
                     b.Navigation("User");
                 });
@@ -421,6 +482,11 @@ namespace Prestacontrol.Infrastructure.Migrations
                     b.Navigation("Loan");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Prestacontrol.Domain.Entities.Client", b =>
+                {
+                    b.Navigation("Loans");
                 });
 
             modelBuilder.Entity("Prestacontrol.Domain.Entities.Installment", b =>

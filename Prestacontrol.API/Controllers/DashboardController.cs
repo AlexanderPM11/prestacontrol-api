@@ -27,14 +27,17 @@ namespace Prestacontrol.API.Controllers
                 .Where(t => t.Type == "Payment")
                 .SumAsync(t => t.Amount);
 
-            var activeClients = await _context.Clients
+            var activeClients = await _context.Loans
+                .Where(l => l.Status == LoanStatus.Active)
+                .Select(l => l.ClientName)
+                .Distinct()
                 .CountAsync();
 
             var pendingInstallments = await _context.Installments
                 .Where(i => i.Status != InstallmentStatus.Paid && i.DueDate.Date == DateTime.Today)
                 .Select(i => new {
                     i.Id,
-                    ClientName = i.Loan.Client.FullName,
+                    ClientName = i.Loan.ClientName,
                     i.Amount,
                     i.LateFeeAmount,
                     i.Status

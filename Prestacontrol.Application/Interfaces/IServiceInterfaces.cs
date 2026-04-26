@@ -12,7 +12,7 @@ namespace Prestacontrol.Application.Interfaces
     public interface ILoanService
     {
         Task<LoanDto> CreateLoanAsync(CreateLoanRequest request, int userId);
-        Task<IEnumerable<LoanDto>> GetClientLoansAsync(int clientId);
+        Task<IEnumerable<LoanDto>> GetClientLoansAsync(string clientName);
         Task<LoanDto?> GetLoanDetailsAsync(int loanId);
     }
 

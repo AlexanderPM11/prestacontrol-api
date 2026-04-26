@@ -111,7 +111,7 @@ namespace Prestacontrol.Application.Services
                 Amount = request.Amount,
                 Type = CashFlowType.Income,
                 Category = "Cobro",
-                Description = $"Cobro de préstamo #{loan.Id} - Cliente ID: {loan.ClientId}",
+                Description = $"Cobro de préstamo #{loan.Id} - Cliente: {loan.ClientName}",
                 UserId = userId,
                 Date = DateTime.Now
             });

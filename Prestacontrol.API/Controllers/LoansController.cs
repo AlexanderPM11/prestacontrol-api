@@ -22,10 +22,17 @@ namespace Prestacontrol.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("client/{clientId}")]
-        public async Task<IActionResult> GetByClient(int clientId)
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
         {
-            var result = await _loanService.GetClientLoansAsync(clientId);
+            var result = await _loanService.GetClientLoansAsync(""); // Empty string means all
+            return Ok(result);
+        }
+
+        [HttpGet("client/{clientName}")]
+        public async Task<IActionResult> GetByClient(string clientName)
+        {
+            var result = await _loanService.GetClientLoansAsync(clientName);
             return Ok(result);
         }
 

@@ -14,22 +14,11 @@ namespace Prestacontrol.Application.DTOs
     public class LoginRequest { public string Username { get; set; } = string.Empty; public string Password { get; set; } = string.Empty; }
     public class LoginResponse { public string Token { get; set; } = string.Empty; public UserDto User { get; set; } = null!; }
 
-    public class ClientDto
-    {
-        public int Id { get; set; }
-        public string FullName { get; set; } = string.Empty;
-        public string DocumentId { get; set; } = string.Empty;
-        public string Phone { get; set; } = string.Empty;
-        public string? Address { get; set; }
-        public string? ReferenceName { get; set; }
-        public string? ReferencePhone { get; set; }
-        public ClientStatus Status { get; set; }
-    }
 
     public class LoanDto
     {
         public int Id { get; set; }
-        public int ClientId { get; set; }
+
         public string ClientName { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public decimal InterestRate { get; set; }
@@ -57,7 +46,7 @@ namespace Prestacontrol.Application.DTOs
 
     public class CreateLoanRequest
     {
-        public int ClientId { get; set; }
+        public string ClientName { get; set; } = string.Empty;
         public decimal Amount { get; set; }
         public decimal InterestRate { get; set; }
         public decimal LateFeeRate { get; set; }

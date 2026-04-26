@@ -25,7 +25,7 @@ namespace Prestacontrol.Infrastructure.Repositories
             await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
     }
 
-    public class ClientRepository : GenericRepository<Client>, IClientRepository { public ClientRepository(Persistence.ApplicationDbContext context) : base(context) { } }
+
     public class LoanRepository : GenericRepository<Loan>, ILoanRepository { public LoanRepository(Persistence.ApplicationDbContext context) : base(context) { } }
     public class InstallmentRepository : GenericRepository<Installment>, IInstallmentRepository { public InstallmentRepository(Persistence.ApplicationDbContext context) : base(context) { } }
     public class PaymentRepository : GenericRepository<Payment>, IPaymentRepository { public PaymentRepository(Persistence.ApplicationDbContext context) : base(context) { } }
@@ -39,7 +39,7 @@ namespace Prestacontrol.Infrastructure.Repositories
         {
             _context = context;
             Users = new UserRepository(_context);
-            Clients = new ClientRepository(_context);
+
             Loans = new LoanRepository(_context);
             Installments = new InstallmentRepository(_context);
             Payments = new PaymentRepository(_context);
@@ -48,7 +48,7 @@ namespace Prestacontrol.Infrastructure.Repositories
         }
 
         public IUserRepository Users { get; private set; }
-        public IClientRepository Clients { get; private set; }
+
         public ILoanRepository Loans { get; private set; }
         public IInstallmentRepository Installments { get; private set; }
         public IPaymentRepository Payments { get; private set; }

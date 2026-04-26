@@ -28,7 +28,7 @@ namespace Prestacontrol.Application.Services
 
             var loan = new Loan
             {
-                ClientId = request.ClientId,
+                ClientName = request.ClientName,
                 UserId = userId,
                 Amount = request.Amount,
                 InterestRate = request.InterestRate,
@@ -64,7 +64,7 @@ namespace Prestacontrol.Application.Services
                 Amount = request.Amount,
                 Type = CashFlowType.Outcome,
                 Category = "Préstamo",
-                Description = $"Desembolso préstamo a cliente ID: {request.ClientId}",
+                Description = $"Desembolso préstamo a cliente: {request.ClientName}",
                 UserId = userId,
                 Date = DateTime.Now
             });
@@ -74,9 +74,9 @@ namespace Prestacontrol.Application.Services
             return _mapper.Map<LoanDto>(loan);
         }
 
-        public async Task<IEnumerable<LoanDto>> GetClientLoansAsync(int clientId)
+        public async Task<IEnumerable<LoanDto>> GetClientLoansAsync(string clientName)
         {
-            var loans = await _unitOfWork.Loans.FindAsync(l => l.ClientId == clientId);
+            var loans = await _unitOfWork.Loans.FindAsync(l => l.ClientName.Contains(clientName));
             return _mapper.Map<IEnumerable<LoanDto>>(loans);
         }
 

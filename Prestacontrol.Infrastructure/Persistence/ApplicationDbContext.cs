@@ -8,7 +8,7 @@ namespace Prestacontrol.Infrastructure.Persistence
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Client> Clients { get; set; }
+
         public DbSet<Loan> Loans { get; set; }
         public DbSet<Installment> Installments { get; set; }
         public DbSet<Payment> Payments { get; set; }
@@ -25,10 +25,6 @@ namespace Prestacontrol.Infrastructure.Persistence
                 entity.HasIndex(e => e.Username).IsUnique();
             });
 
-            // Client configuration
-            modelBuilder.Entity<Client>(entity => {
-                entity.HasIndex(e => e.DocumentId).IsUnique();
-            });
 
             // Loan configuration
             modelBuilder.Entity<Loan>(entity => {
@@ -38,10 +34,7 @@ namespace Prestacontrol.Infrastructure.Persistence
                 entity.Property(e => e.TotalToPay).HasPrecision(15, 2);
                 entity.Property(e => e.BalanceDue).HasPrecision(15, 2);
 
-                entity.HasOne(e => e.Client)
-                    .WithMany(c => c.Loans)
-                    .HasForeignKey(e => e.ClientId)
-                    .OnDelete(DeleteBehavior.Restrict);
+
 
                 entity.HasOne(e => e.User)
                     .WithMany(u => u.CreatedLoans)

@@ -9,11 +9,7 @@ namespace Prestacontrol.Application.Mappings
         public MappingProfile()
         {
             CreateMap<User, UserDto>();
-            CreateMap<Client, ClientDto>().ReverseMap();
-            
-            CreateMap<Loan, LoanDto>()
-                .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.Client.FullName));
-            
+            CreateMap<Loan, LoanDto>();
             CreateMap<Installment, InstallmentDto>();
             
             CreateMap<CreateLoanRequest, Loan>();

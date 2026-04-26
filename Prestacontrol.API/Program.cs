@@ -38,7 +38,7 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddValidatorsFromAssemblyContaining<ClientValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateLoanValidator>();
 
 // JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

@@ -22,24 +22,11 @@ namespace Prestacontrol.Domain.Entities
         public ICollection<CashFlow> RegisteredCashFlows { get; set; } = new List<CashFlow>();
     }
 
-    public class Client : BaseEntity
-    {
-        public string FullName { get; set; } = string.Empty;
-        public string DocumentId { get; set; } = string.Empty;
-        public string Phone { get; set; } = string.Empty;
-        public string? Address { get; set; }
-        public string? PhotoUrl { get; set; }
-        public string? ReferenceName { get; set; }
-        public string? ReferencePhone { get; set; }
-        public ClientStatus Status { get; set; } = ClientStatus.Active;
 
-        public ICollection<Loan> Loans { get; set; } = new List<Loan>();
-    }
 
     public class Loan : BaseEntity
     {
-        public int ClientId { get; set; }
-        public Client Client { get; set; } = null!;
+        public string ClientName { get; set; } = string.Empty;
         public int UserId { get; set; }
         public User User { get; set; } = null!;
 
